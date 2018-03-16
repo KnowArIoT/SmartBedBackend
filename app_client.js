@@ -32,6 +32,17 @@ socket.on('message', function(message) {
       httpGet('http://192.168.100.210:3000/switch/2/off');
     }
   }
+  else if (message.type == "heat") {
+    console.log("heat");
+    if (message.value) {
+      console.log("calling toggleHeat On");
+      httpGet('http://192.168.100.210:3000/switch/1/on');
+    }
+    else if (!message.value) {
+      console.log("calling toggleHeat Off");
+      httpGet('http://192.168.100.210:3000/switch/1/off');
+    }
+  }
 });
 
 

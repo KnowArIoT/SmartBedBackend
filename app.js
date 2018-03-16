@@ -34,4 +34,14 @@ io.sockets.on('connection', function (socket) {
       var dimValue = req.params.dimValue
       socket.emit('message', {type: "light", dimValue: dimValue});
     });
+
+    app.get('/toggleHeatOn', function(req, res){
+      console.log("calling toggleHeatOn");
+      socket.emit('message', {type: "heat", value: true});
+    });
+
+    app.get('/toggleHeatOff', function(req, res){
+      console.log("calling toggleHeatOff");
+      socket.emit('message', {type: "heat", value: false});
+    });
 });
