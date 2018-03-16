@@ -8,6 +8,8 @@ app.get('/', function(req, res){
   console.log("calling root /");
 });
 
+
+
 http.listen(8080, function(){
   console.log('listening on *:8080');
 });
@@ -65,7 +67,7 @@ io.sockets.on('connection', function (socket) {
 
     app.get('/setFeetAngle/:value', function(req, res){
       console.log("calling setFeetAngle");
-      var dimValue = req.params.value;
+      var value = req.params.value;
       socket.emit('message', {type: "feetAngle", feetAngleValue: value});
     });
 

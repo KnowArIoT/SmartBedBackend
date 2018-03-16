@@ -12,6 +12,10 @@ app.get('/', function(req, res){
   console.log("i am client /");
 });
 
+server.listen(8080, function(){
+  console.log('listening on *:8080');
+});
+
 app.get('/registerSensorData/:pressure.:light.:flex.:temperature.:humidity', function(req, res) {
   console.log("sending sensor Data " + JSON.stringify(req.params));
   socket.emit('message', {type: "sensorData", pressure: req.params.pressure, light: req.params.light, flex: req.params.flex, temperature: req.params.temperature, humidity: req.params.humidity});
@@ -50,11 +54,11 @@ socket.on('message', function(message) {
   }
   else if (message.type == "headAngle") {
     console.log("calling headAngle");
-    httpGet('http://192.168.100.210:3000/angle/' + 'a/'+ (message.headAngleValue));
+    httpGet('http://192.168.100.210:3000/angle/' + 'A/'+ (message.headAngleValue));
   }
   else if (message.type == "feetAngle") {
     console.log("calling feetAngle");
-    httpGet('http://192.168.100.210:3000/angle/' + 'b/'+ (message.headAngleValue));
+    httpGet('http://192.168.100.210:3000/angle/' + 'B/'+ (message.feetAngleValue));
   }
   else if (message.type == "setAlarm") {
     console.log("calling setAlarm");
