@@ -1,6 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+const fetch = require('node-fetch')
 
 
 app.get('/', function(req, res){
@@ -17,6 +18,17 @@ io.sockets.on('connection', function (socket) {
     // When the server receives a “message” type signal from the client
     socket.on('message', function (message) {
         console.log('A client is speaking to me! They’re saying: ' + message);
+
+        if (message.type == "sensorData") {
+          console.log("received Sensor data " + JSON.stringify(message));
+          httpPost('http://localhost/sensorData', JSON.stringify({
+            pressure: message.pressure,
+            light: message.light,
+            flex: message.flex,
+            temperature: message.temperature,
+            humidity: message.humidity
+          }));
+        }
     });
 
     app.get('/toggleLightOn', function(req, res){
@@ -44,4 +56,41 @@ io.sockets.on('connection', function (socket) {
       console.log("calling toggleHeatOff");
       socket.emit('message', {type: "heat", value: false});
     });
+
+    app.get('/setHeadAngle/:value', function(req, res){
+      console.log("calling setHeadAngle");
+      var value = req.params.value
+      socket.emit('message', {type: "headAngle", headAngleValue: value});
+    });
+
+    app.get('/setFeetAngle/:value', function(req, res){
+      console.log("calling setFeetAngle");
+      var dimValue = req.params.value
+      socket.emit('message', {type: "feetAngle", feetAngleValue: value});
+    });
 });
+
+function httpGet(url)
+{
+  fetch(url)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(myJson) {
+      console.log(myJson);
+    });
+}
+
+function httpPost(url, data)
+{
+  fetch(url, {
+    body: data,
+    method: 'POST'
+  })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(myJson) {
+      console.log(myJson);
+    });
+}

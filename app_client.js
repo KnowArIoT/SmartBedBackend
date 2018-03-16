@@ -12,6 +12,11 @@ app.get('/', function(req, res){
   console.log("i am client /");
 });
 
+app.get('/registerSensorData/:pressure.:light.:flex.:temperature.:humidity', function(req, res) {
+  console.log("sending sensor Data " + JSON.stringify(req.params));
+  socket.emit('message', {type: "sensorData", pressure: req.params.pressure, light: req.params.light, flex: req.params.flex, temperature: req.params.temperature, humidity: req.params.humidity});
+});
+
 socket.on('message', function(message) {
   console.log("server says " + JSON.stringify(message));
   if (message == "You are connected!") {
@@ -42,6 +47,14 @@ socket.on('message', function(message) {
       console.log("calling toggleHeat Off");
       httpGet('http://192.168.100.210:3000/switch/1/off');
     }
+  }
+  else if (message.type == "headAngle") {
+    console.log("calling headAngle");
+    httpGet('http://192.168.100.210:3000/angle/' + 'a/'+ (message.headAngleValue));
+  }
+  else if (message.type == "feetAngle") {
+    console.log("calling feetAngle");
+    httpGet('http://192.168.100.210:3000/angle/' + 'b/'+ (message.headAngleValue));
   }
 });
 
