@@ -21,7 +21,7 @@ io.sockets.on('connection', function (socket) {
 
         if (message.type == "sensorData") {
           console.log("received Sensor data " + JSON.stringify(message));
-          httpPost('http://localhost/sensorData', JSON.stringify({
+          httpPost('http://localhost/sensorData/insertValues', JSON.stringify({
         bed_id: "ariot_seng",
         data: [
           {
