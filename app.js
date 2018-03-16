@@ -22,12 +22,30 @@ io.sockets.on('connection', function (socket) {
         if (message.type == "sensorData") {
           console.log("received Sensor data " + JSON.stringify(message));
           httpPost('http://localhost/sensorData', JSON.stringify({
-            pressure: message.pressure,
-            light: message.light,
-            flex: message.flex,
-            temperature: message.temperature,
-            humidity: message.humidity
-          }));
+        bed_id: "ariot_seng",
+        data: [
+          {
+              name: "pressure",
+              value: message.pressure
+          },
+          {
+              "name": "light",
+              "value": message.light
+          },
+          {
+              "name": "flex",
+              "value": message.flex
+          },
+          {
+              "name": "temperature",
+              "value": message.temperature
+          },
+          {
+              name: "humidity",
+              value: message.humidity
+          }
+        ]
+        });
         }
     });
 
