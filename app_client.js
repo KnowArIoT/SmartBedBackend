@@ -56,6 +56,16 @@ socket.on('message', function(message) {
     console.log("calling feetAngle");
     httpGet('http://192.168.100.210:3000/angle/' + 'b/'+ (message.headAngleValue));
   }
+  else if (message.type == "setAlarm") {
+    console.log("calling setAlarm");
+    if (message.time == 0) {
+      //slett alarm
+    }
+    else {
+      // Set alarm
+    }
+    // Peder fix set alarm
+  }
 });
 
 

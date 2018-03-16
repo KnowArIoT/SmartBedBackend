@@ -59,14 +59,20 @@ io.sockets.on('connection', function (socket) {
 
     app.get('/setHeadAngle/:value', function(req, res){
       console.log("calling setHeadAngle");
-      var value = req.params.value
+      var value = req.params.value;
       socket.emit('message', {type: "headAngle", headAngleValue: value});
     });
 
     app.get('/setFeetAngle/:value', function(req, res){
       console.log("calling setFeetAngle");
-      var dimValue = req.params.value
+      var dimValue = req.params.value;
       socket.emit('message', {type: "feetAngle", feetAngleValue: value});
+    });
+
+    app.get('/setAlarm/:time', function(req, res){
+      console.log("calling setAlarm");
+      var time = req.params.time;
+      socket.emit('message', {type: "setAlarm", time: time});
     });
 });
 
