@@ -4,14 +4,9 @@ var io = require('socket.io')(http);
 const fetch = require('node-fetch')
 
 
-var sensorDataArray = [];
 
 app.get('/', function(req, res){
   console.log("calling root /");
-});
-
-app.get('/getSensorData', function(req, res){
-  res.send(sensorDataArray);
 });
 
 http.listen(8080, function(){
@@ -62,7 +57,6 @@ io.sockets.on('connection', function (socket) {
             }
           ]
         }
-        sensorDataArray.push(obj);
           httpPost('http://localhost:8081/sensorData/insertValues', JSON.stringify(obj));
       }
     });
