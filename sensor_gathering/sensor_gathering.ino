@@ -10,6 +10,7 @@ int fsrAnalogPin = 1;
 int fsrReading;
 int flexPin = 2;
 int flexReading;
+int timeBetweenReadings = 1000;
 
 void setup(){
   Serial.begin(9600);
@@ -25,7 +26,7 @@ void loop()
   photocellReading = map(photocellReading, 670, 1000, 0, 100);
   flexReading = map(flexReading, 700, 900, 0, 100);
 
-  
+
   Serial.print(fsrReading);
   Serial.print(",");
   Serial.print(photocellReading);
@@ -35,6 +36,5 @@ void loop()
   Serial.print(DHT.temperature);
   Serial.print(",");
   Serial.println(DHT.humidity);
-  delay(1000);
+  delay(timeBetweenReadings);
 }
-

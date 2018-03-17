@@ -4,11 +4,15 @@ var io = require('socket.io')(http);
 const fetch = require('node-fetch')
 
 
+var sensorDataArray = [];
+
 app.get('/', function(req, res){
   console.log("calling root /");
 });
 
-
+app.get('/getSensorData', function(req, res){
+  res.send(sensorDataArray);
+});
 
 http.listen(8080, function(){
   console.log('listening on *:8080');
@@ -19,36 +23,48 @@ io.sockets.on('connection', function (socket) {
     socket.emit('message', 'You are connected!');
     // When the server receives a “message” type signal from the client
     socket.on('message', function (message) {
-        console.log('A client is speaking to me! They’re saying: ' + message);
+        const strMessage = {...message}
+        console.log('A client is speaking to me! They’re saying:\n ' + JSON.stringify(strMessage));
+        console.log("type: " + message.type);
 
         if (message.type == "sensorData") {
-          console.log("received Sensor data " + JSON.stringify(message));
-          httpPost('http://localhost/sensorData/insertValues', JSON.stringify({
-        bed_id: "ariot_seng",
-        data: [
-          {
-              name: "pressure",
-              value: message.pressure
-          },
-          {
-              "name": "light",
-              "value": message.light
-          },
-          {
-              "name": "flex",
-              "value": message.flex
-          },
-          {
-              "name": "temperature",
-              "value": message.temperature
-          },
-          {
-              name: "humidity",
-              value: message.humidity
+          var pressure = parseInt(message.pressure)
+          var light = parseInt(message.light)
+          var flex = parseInt(message.flex)
+          var temperature = parseFloat(message.temperature)
+          var humidity = message.humidity
+          if (humidity.indexOf("\r\n") !== -1) {
+            humidity = humidity.slice(0, -4);
           }
-        ]
-        });
+          humidity = parseFloat(humidity);
+          obj = {
+          bed_id: "ariot_seng",
+          data: [
+            {
+                name: "pressure",
+                value: pressure
+            },
+            {
+                "name": "light",
+                "value": light
+            },
+            {
+                "name": "flex",
+                "value": flex
+            },
+            {
+                "name": "temperature",
+                "value": temperature
+            },
+            {
+                name: "humidity",
+                value: humidity
+            }
+          ]
         }
+        sensorDataArray.push(obj);
+          httpPost('http://localhost:8081/sensorData/insertValues', JSON.stringify(obj));
+      }
     });
 
     app.get('/toggleLightOn', function(req, res){
@@ -104,19 +120,28 @@ function httpGet(url)
     })
     .then(function(myJson) {
       console.log(myJson);
+    })
+    .catch((error) => {
+      console.log("error " + error);
     });
 }
 
 function httpPost(url, data)
 {
   fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
     body: data,
     method: 'POST'
   })
     .then(function(response) {
-      return response.json();
+      const strMessage = {...response}
+      console.log("response " + JSON.stringify(strMessage))
+      console.log(response.status);
     })
-    .then(function(myJson) {
-      console.log(myJson);
+    .catch((error) => {
+      console.log("error " + error);
     });
 }

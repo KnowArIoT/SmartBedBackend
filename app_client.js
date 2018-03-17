@@ -4,6 +4,9 @@ var server = require('http').Server(app);
 var http = require('http')
 var xmlHttpRequest = require("xmlhttprequest");
 const fetch = require('node-fetch')
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 var io = require('socket.io-client'),
 socket = io.connect('http://35.187.83.210/');
@@ -16,9 +19,10 @@ server.listen(8080, function(){
   console.log('listening on *:8080');
 });
 
-app.get('/registerSensorData/:pressure.:light.:flex.:temperature.:humidity', function(req, res) {
-  console.log("sending sensor Data " + JSON.stringify(req.params));
-  socket.emit('message', {type: "sensorData", pressure: req.params.pressure, light: req.params.light, flex: req.params.flex, temperature: req.params.temperature, humidity: req.params.humidity});
+app.post('/registerSensorData', function(req, res) {
+  console.log("sending sensor Data " + JSON.stringify(req.body));
+  res.send("ok")
+  socket.emit('message', {type: "sensorData", pressure: req.body.pressure, light: req.body.light, flex: req.body.flex, temperature: req.body.temperature, humidity: req.body.humidity});
 });
 
 socket.on('message', function(message) {
@@ -81,5 +85,8 @@ function httpGet(url)
     })
     .then(function(myJson) {
       console.log(myJson);
+    })
+    .catch((error) => {
+      console.log("error " + error);
     });
 }
