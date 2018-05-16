@@ -6,6 +6,7 @@ const fetch = require('node-fetch')
 
 
 app.get('/', function(req, res){
+  res.send("KnowIot backend service is running!");
   console.log("calling root /");
 });
 

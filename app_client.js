@@ -9,9 +9,10 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 var io = require('socket.io-client'),
-socket = io.connect('http://35.187.83.210/');
+socket = io.connect('https://ariot.knowit.no/');
 
 app.get('/', function(req, res){
+  res.send("KnowIot client service is running!");
   console.log("i am client /");
 });
 
@@ -34,35 +35,35 @@ socket.on('message', function(message) {
     console.log("light");
     if (message.dimValue) {
       console.log("calling dimLight");
-      httpGet('http://192.168.100.210:3000/dim/2/' + (message.dimValue * parseInt(2.5)));
+      httpGet('http://localhost:3000/dim/2/' + (message.dimValue * parseInt(2.5)));
     }
     else if (message.value) {
       console.log("calling toggleLight On");
-      httpGet('http://192.168.100.210:3000/switch/2/on');
+      httpGet('http://localhost:3000/switch/2/on');
     }
     else if (!message.value) {
       console.log("calling toggleLight Off");
-      httpGet('http://192.168.100.210:3000/switch/2/off');
+      httpGet('http://localhost:3000/switch/2/off');
     }
   }
   else if (message.type == "heat") {
     console.log("heat");
     if (message.value) {
       console.log("calling toggleHeat On");
-      httpGet('http://192.168.100.210:3000/switch/1/on');
+      httpGet('http://localhost:3000/switch/1/on');
     }
     else if (!message.value) {
       console.log("calling toggleHeat Off");
-      httpGet('http://192.168.100.210:3000/switch/1/off');
+      httpGet('http://localhost:3000/switch/1/off');
     }
   }
   else if (message.type == "headAngle") {
     console.log("calling headAngle");
-    httpGet('http://192.168.100.210:3000/angle/' + 'A/'+ (message.headAngleValue));
+    httpGet('http://localhost:3000/angle/' + 'A/'+ (message.headAngleValue));
   }
   else if (message.type == "feetAngle") {
     console.log("calling feetAngle");
-    httpGet('http://192.168.100.210:3000/angle/' + 'B/'+ (message.feetAngleValue));
+    httpGet('http://localhost:3000/angle/' + 'B/'+ (message.feetAngleValue));
   }
   else if (message.type == "setAlarm") {
     console.log("calling setAlarm");
