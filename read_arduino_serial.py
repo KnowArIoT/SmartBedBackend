@@ -4,6 +4,7 @@ import requests
 
 url = 'http://localhost:8080/registerSensorData'
 # url = 'http://localhost:8080'
+FLEX_THRESHOLD = 25
 
 ser = serial.Serial('/dev/ttyACM0',9600)
 while True:
@@ -19,9 +20,10 @@ while True:
               data['temperature'] = sensor_value_array[3]
               data['humidity'] = sensor_value_array[4]
               print data
-              try:
-                  r = requests.post(url, data = data, timeout=3)#, data=data)
-              except Exception as e:
-                  print e
-                  print "Something went wrong when calling " + url
-                  pass
+              if sensor_value_array[2] > FLEX_THRESHOLD:
+                  try:
+                      r = requests.post(url, data = data, timeout=3)#, data=data)
+                  except Exception as e:
+                      print e
+                      print "Something went wrong when calling " + url
+                      pass

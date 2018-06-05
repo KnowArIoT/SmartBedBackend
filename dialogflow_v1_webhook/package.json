@@ -1,0 +1,7 @@
+{
+  "name": "dialogflow_v1_webhook",
+  "description": "webhook",
+  "dependencies": {
+    "node-fetch": "^2.1.2"
+  }
+}

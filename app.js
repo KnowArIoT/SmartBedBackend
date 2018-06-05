@@ -1,20 +1,106 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const fetch = require('node-fetch')
+var bodyParser = require('body-parser');
+var log4js = require('log4js');
 
-
-
-app.get('/', function(req, res){
-  console.log("calling root /");
+log4js.configure({
+  appenders: { 'file': { type: 'file', filename: 'logs/app_client.log' } },
+  categories: { default: { appenders: ['file'], level: 'debug' } }
 });
+var logger = log4js.getLogger();
+logger.level = 'debug';
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+socket = null;
 
 http.listen(8080, function(){
   console.log('listening on *:8080');
 });
 
-io.sockets.on('connection', function (socket) {
+app.get('/', function(req, res){
+  console.log("calling root /");
+  res.send({});
+});
+
+app.get('/toggleLightOn', function(req, res){
+  console.log("calling toggleLightOn");
+  socket.emit('message', {type: "light", value: true});
+  res.send({});
+});
+
+app.get('/toggleLightOff', function(req, res){
+  console.log("calling toggleLightOff");
+  socket.emit('message', {type: "light", value: false});
+  res.send({});
+});
+
+app.get('/dimLight/:dimValue', function(req, res){
+  console.log("calling dimLight");
+  var dimValue = req.params.dimValue
+  socket.emit('message', {type: "light", dimValue: dimValue});
+  res.send({});
+});
+
+app.get('/toggleHeatOn', function(req, res){
+  console.log("calling toggleHeatOn");
+  socket.emit('message', {type: "heat", value: true});
+  res.send({});
+});
+
+app.get('/toggleHeatOff', function(req, res){
+  console.log("calling toggleHeatOff");
+  socket.emit('message', {type: "heat", value: false});
+  res.send({});
+});
+
+app.get('/setHeadAngle/:value', function(req, res){
+  console.log("calling setHeadAngle");
+  var value = req.params.value;
+  socket.emit('message', {type: "headAngle", headAngleValue: value});
+  res.send({});
+});
+
+app.get('/setFeetAngle/:value', function(req, res){
+  console.log("calling setFeetAngle");
+  var value = req.params.value;
+  socket.emit('message', {type: "feetAngle", feetAngleValue: value});
+  res.send({});
+});
+
+app.get('/setAlarm/:time', function(req, res){
+  console.log("calling setAlarm");
+  var time = req.params.time;
+  socket.emit('message', {type: "setAlarm", time: time});
+  res.send({});
+});
+app.get('/scene/wakeup', function(req, res){
+  console.log("calling wakeup");
+  socket.emit('message', {type: "wakeup"});
+  res.send({});
+});
+app.get('/scene/sleep', function(req, res){
+  console.log("calling sleep");
+  socket.emit('message', {type: "sleep"});
+  res.send({});
+});
+
+app.post('/bed', function(req, res){
+  var startOrStop = req.body.startOrStop;
+  var headOrFeet = req.body.headOrFeet;
+  var direction = req.body.direction;
+  socket.emit('message', {type: "bed", startOrStop: startOrStop, headOrFeet: headOrFeet, direction: direction});
+  res.send({});
+});
+
+io.sockets.on('connection', function (newSocket) {
     console.log('A client is connected!');
+    socket = newSocket;
     socket.emit('message', 'You are connected!');
     // When the server receives a “message” type signal from the client
     socket.on('message', function (message) {
@@ -59,50 +145,6 @@ io.sockets.on('connection', function (socket) {
         }
           httpPost('http://localhost:8081/sensorData/insertValues', JSON.stringify(obj));
       }
-    });
-
-    app.get('/toggleLightOn', function(req, res){
-      console.log("calling toggleLightOn");
-      socket.emit('message', {type: "light", value: true});
-    });
-
-    app.get('/toggleLightOff', function(req, res){
-      console.log("calling toggleLightOff");
-      socket.emit('message', {type: "light", value: false});
-    });
-
-    app.get('/dimLight/:dimValue', function(req, res){
-      console.log("calling dimLight");
-      var dimValue = req.params.dimValue
-      socket.emit('message', {type: "light", dimValue: dimValue});
-    });
-
-    app.get('/toggleHeatOn', function(req, res){
-      console.log("calling toggleHeatOn");
-      socket.emit('message', {type: "heat", value: true});
-    });
-
-    app.get('/toggleHeatOff', function(req, res){
-      console.log("calling toggleHeatOff");
-      socket.emit('message', {type: "heat", value: false});
-    });
-
-    app.get('/setHeadAngle/:value', function(req, res){
-      console.log("calling setHeadAngle");
-      var value = req.params.value;
-      socket.emit('message', {type: "headAngle", headAngleValue: value});
-    });
-
-    app.get('/setFeetAngle/:value', function(req, res){
-      console.log("calling setFeetAngle");
-      var value = req.params.value;
-      socket.emit('message', {type: "feetAngle", feetAngleValue: value});
-    });
-
-    app.get('/setAlarm/:time', function(req, res){
-      console.log("calling setAlarm");
-      var time = req.params.time;
-      socket.emit('message', {type: "setAlarm", time: time});
     });
 });
 
