@@ -6,9 +6,9 @@ dht DHT;
 
 int photocellPin = 0;
 int photocellReading;
-int fsrAnalogPin = 1;
+int fsrAnalogPin = 2;
 int fsrReading;
-int flexPin = 2;
+int flexPin = 4;
 int flexReading;
 
 void setup(){
@@ -22,8 +22,8 @@ void loop()
   flexReading = analogRead(flexPin);
   int chk = DHT.read11(DHT11_PIN);
 
-  photocellReading = map(photocellReading, 670, 1000, 0, 100);
-  flexReading = map(flexReading, 700, 900, 0, 100);
+  //photocellReading = map(photocellReading, 670, 1000, 0, 100);
+  //flexReading = map(flexReading, 700, 900, 0, 100);
 
 
   Serial.print(fsrReading);
