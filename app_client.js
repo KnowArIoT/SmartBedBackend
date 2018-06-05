@@ -131,30 +131,55 @@ function httpGet(url)
 }
 
 function bedControl(startOrStop, headOrFeet, direction) {
-  s = 0;
+  const defaultCode = 0;
+  const startFeetUp = 2;
+  const startHeadUp = 1;
+  const stopFeetUp = 6;
+  const stopHeadUp = 5;
+  const startFeetDown = 4;
+  const startHeadDown = 3;
+  const stopFeetDown = 8;
+  const stopHeadDown = 7;
+
+
   if (startOrStop == 'start' && headOrFeet == 'feet' && direction == 'up') {
-    s = 2;
+    arduinoController.writeToMotorArduino(stopFeetUp);
+    arduinoController.writeToMotorArduino(startFeetUp);
+    return;
+    //s = 2;
   }
   else if (startOrStop == 'start' && headOrFeet == 'head' && direction == 'up') {
-    s = 1;
+    arduinoController.writeToMotorArduino(stopHeadUp);
+    arduinoController.writeToMotorArduino(startHeadUp);
+    return;
+    //s = 1;
   }
   else if (startOrStop == 'stop' && headOrFeet == 'feet' && direction == 'up') {
-    s = 6;
+      arduinoController.writeToMotorArduino(stopFeetUp);
+      return;
   }
   else if (startOrStop == 'stop' && headOrFeet == 'head' && direction == 'up') {
-    s = 5;
+      arduinoController.writeToMotorArduino(stopHeadUp);
+      return;
   }
   else if (startOrStop == 'start' && headOrFeet == 'feet' && direction == 'down') {
-    s = 4;
+      arduinoController.writeToMotorArduino(stopFeetDown);
+      arduinoController.writeToMotorArduino(startFeetDown);
+      return;
   }
   else if (startOrStop == 'start' && headOrFeet == 'head' && direction == 'down') {
-    s = 3;
+      arduinoController.writeToMotorArduino(stopHeadDown);
+      arduinoController.writeToMotorArduino(startHeadDown);
+      return;
   }
   else if (startOrStop == 'stop' && headOrFeet == 'feet' && direction == 'down') {
-    s = 8;
+      arduinoController.writeToMotorArduino(stopFeetDown);
+      return;
   }
   else if (startOrStop == 'stop' && headOrFeet == 'head' && direction == 'down') {
-    s = 7;
+      arduinoController.writeToMotorArduino(stopHeadDown);
+      return;
   }
-  arduinoController.writeToMotorArduino(s, logger);
+
+  arduinoController.writeToMotorArduino(defaultCode, logger);
 }
