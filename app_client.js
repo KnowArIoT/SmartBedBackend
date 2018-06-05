@@ -63,6 +63,34 @@ socket.on('message', function(message) {
       httpGet('http://localhost:3000/switch/1/off');
     }
   }
+  else if (message.type == "bed") {
+    s = 0;
+    if (message.startOrStop == 'start' && message.headOrFeet == 'feet' && message.direction == 'up') {
+      s = 2;
+    }
+    else if (message.startOrStop == 'start' && message.headOrFeet == 'head' && message.direction == 'up') {
+      s = 1;
+    }
+    else if (message.startOrStop == 'stop' && message.headOrFeet == 'feet' && message.direction == 'up') {
+      s = 6;
+    }
+    else if (message.startOrStop == 'stop' && message.headOrFeet == 'head' && message.direction == 'up') {
+      s = 5;
+    }
+    else if (message.startOrStop == 'start' && message.headOrFeet == 'feet' && message.direction == 'down') {
+      s = 4;
+    }
+    else if (message.startOrStop == 'start' && message.headOrFeet == 'head' && message.direction == 'down') {
+      s = 3;
+    }
+    else if (message.startOrStop == 'stop' && message.headOrFeet == 'feet' && message.direction == 'down') {
+      s = 8;
+    }
+    else if (message.startOrStop == 'stop' && message.headOrFeet == 'head' && message.direction == 'down') {
+      s = 7;
+    }
+    arduinoMotorControl.writeToMotorArduino(s, logger);
+  }
   else if (message.type == "setAlarm") {
     logger.debug("calling setAlarm");
     if (message.time == 0) {

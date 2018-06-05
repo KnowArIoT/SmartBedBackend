@@ -33,10 +33,12 @@ void loop()
   if (readString.length() > 0) {
       n = readString.toInt();
       readString="";
+      // n = 1, 2, 3, 4, 5, 6, 7, 8, 1-4
       if (n < 5) {
-        digitalWrite(n + 1, LOW);
+        digitalWrite(n + 1, HIGH);
       }
       else {
-        digitalWrite(n - 3, HIGH);
+        digitalWrite(n - 3, LOW);
       }
   }
+}
