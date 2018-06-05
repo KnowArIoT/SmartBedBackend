@@ -5,6 +5,7 @@ var io = require('socket.io')(http);
 const fetch = require('node-fetch')
 var bodyParser = require('body-parser');
 var log4js = require('log4js');
+var log4js = require('./db-helper');
 
 log4js.configure({
   appenders: { 'file': { type: 'file', filename: 'logs/app_client.log' } },
@@ -26,6 +27,11 @@ http.listen(8080, function(){
 app.get('/', function(req, res){
   res.send("KnowIot backend service is running!");
   console.log("calling root /");
+  res.send({});
+});
+
+app.get('/sensorData', function(req, res){
+  //Sebastian, get sensordata på dette formatet
   res.send({});
 });
 
@@ -57,20 +63,6 @@ app.get('/toggleHeatOn', function(req, res){
 app.get('/toggleHeatOff', function(req, res){
   console.log("calling toggleHeatOff");
   socket.emit('message', {type: "heat", value: false});
-  res.send({});
-});
-
-app.get('/setHeadAngle/:value', function(req, res){
-  console.log("calling setHeadAngle");
-  var value = req.params.value;
-  socket.emit('message', {type: "headAngle", headAngleValue: value});
-  res.send({});
-});
-
-app.get('/setFeetAngle/:value', function(req, res){
-  console.log("calling setFeetAngle");
-  var value = req.params.value;
-  socket.emit('message', {type: "feetAngle", feetAngleValue: value});
   res.send({});
 });
 
