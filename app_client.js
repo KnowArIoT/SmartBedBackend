@@ -4,7 +4,7 @@ var server = require('http').Server(app);
 var http = require('http')
 const fetch = require('node-fetch')
 var bodyParser = require('body-parser');
-var arduinoMotorControl = require('./arduino-motor-controller');
+var arduinoController = require('./arduino-controller');
 var log4js = require('log4js');
 
 log4js.configure({
@@ -18,11 +18,9 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 var io = require('socket.io-client'),
 socket = io.connect('https://ariot.knowit.no/');
-arduinoMotorControl.connectToMotorArduino(logger);
 
 app.get('/', function(req, res){
   res.send("KnowIot client service is running!");
-  console.log("i am client /");
 });
 
 server.listen(8080, function(){
@@ -31,8 +29,13 @@ server.listen(8080, function(){
 
 app.post('/registerSensorData', function(req, res) {
   logger.debug("sending sensor Data " + JSON.stringify(req.body));
-  res.send("ok")
   socket.emit('message', {type: "sensorData", pressure: req.body.pressure, light: req.body.light, flex: req.body.flex, temperature: req.body.temperature, humidity: req.body.humidity});
+  res.send("ok")
+});
+
+socket.on('connect', function() {
+  logger.debug("Connected to socket");
+  arduinoController.setSocket(socket);
 });
 
 socket.on('message', function(message) {
@@ -89,7 +92,7 @@ socket.on('message', function(message) {
     else if (message.startOrStop == 'stop' && message.headOrFeet == 'head' && message.direction == 'down') {
       s = 7;
     }
-    arduinoMotorControl.writeToMotorArduino(s, logger);
+    arduinoControlles.writeToMotorArduino(s, logger);
   }
   else if (message.type == "setAlarm") {
     logger.debug("calling setAlarm");

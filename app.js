@@ -114,11 +114,7 @@ io.sockets.on('connection', function (newSocket) {
           var light = parseInt(message.light)
           var flex = parseInt(message.flex)
           var temperature = parseFloat(message.temperature)
-          var humidity = message.humidity
-          if (humidity.indexOf("\r\n") !== -1) {
-            humidity = humidity.slice(0, -4);
-          }
-          humidity = parseFloat(humidity);
+          var humidity = parseFloat(humidity);
           obj = {
           bed_id: "ariot_seng",
           data: [
