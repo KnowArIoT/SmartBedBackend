@@ -1,28 +1,29 @@
-var SerialPort = require('serialport');
-var Readline = SerialPort.parsers.Readline
+const SerialPort = require('serialport');
 
-arduinoMotorPortConnected = false;
-arduinoSensorPortConnected = false;
+const { Readline } = SerialPort.parsers;
 
-var socket = null;
+let arduinoMotorPortConnected = false;
+let arduinoSensorPortConnected = false; // eslint-disable-line
 
-var arduinoMotorPort = new SerialPort('/dev/arduinoMotorControl', {
-  baudRate: 9600
+let socket = null;
+
+const arduinoMotorPort = new SerialPort('/dev/arduinoMotorControl', {
+  baudRate: 9600,
 });
-var arduinoSensorPort = new SerialPort('/dev/arduinoSensorControl', {
-  baudRate: 9600
+const arduinoSensorPort = new SerialPort('/dev/arduinoSensorControl', {
+  baudRate: 9600,
 });
 
-arduinoMotorPort.on('open', function () {
+arduinoMotorPort.on('open', () => {
   arduinoMotorPortConnected = true;
 });
-arduinoSensorPort.on('open', function () {
+arduinoSensorPort.on('open', () => {
   arduinoSensorPortConnected = true;
 });
 
-function writeToMotorArduino(data, logger) {
+function writeToMotorArduino(data) {
   if (arduinoMotorPortConnected) {
-    arduinoMotorPort.write(data + "");
+    arduinoMotorPort.write(`${data}`);
   }
 }
 
@@ -30,17 +31,17 @@ function setSocket(newSocket) {
   socket = newSocket;
 }
 
-var parser = new Readline()
-arduinoSensorPort.pipe(parser)
-parser.on('data', function (data) {
+const parser = new Readline();
+arduinoSensorPort.pipe(parser);
+parser.on('data', data => {
   if (socket != null && data != null) {
-    data = data.slice(0, -2);
-    var sensorData = data.split(',');
+    data.slice(0, -2);
+    // const sensorData = data.split(',');
     // socket.emit('message', {type: "sensorData", pressure: sensorData[0], light: sensorData[1], flex: sensorData[2], temperature: sensorData[3], humidity: sensorData[4]});
   }
-})
+});
 
 module.exports = {
-  writeToMotorArduino: writeToMotorArduino,
-  setSocket: setSocket
-}
+  writeToMotorArduino,
+  setSocket,
+};
