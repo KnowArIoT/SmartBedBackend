@@ -36,7 +36,7 @@ parser.on('data', function (data) {
   if (socket != null && data != null) {
     data = data.slice(0, -2);
     var sensorData = data.split(',');
-    socket.emit('message', {type: "sensorData", pressure: sensorData[0], light: sensorData[1], flex: sensorData[2], temperature: sensorData[3], humidity: sensorData[4]});
+    // socket.emit('message', {type: "sensorData", pressure: sensorData[0], light: sensorData[1], flex: sensorData[2], temperature: sensorData[3], humidity: sensorData[4]});
   }
 })
 

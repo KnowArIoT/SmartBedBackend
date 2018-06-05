@@ -22,6 +22,22 @@ app.get('/', function(req, res){
   res.send("KnowIot client service is running!");
 });
 
+app.post('/bed', function(req, res){
+  var startOrStop = req.body.startOrStop;
+  var headOrFeet = req.body.headOrFeet;
+  var direction = req.body.direction;
+  bedControl(startOrStop, headOrFeet, direction);
+  res.send({});
+});
+
+app.get('/bed/:startOrStop/:headOrFeet/:direction', function(req, res){
+  var startOrStop = req.params.startOrStop;
+  var headOrFeet = req.params.headOrFeet;
+  var direction = req.params.direction;
+  bedControl(startOrStop, headOrFeet, direction);
+  res.send({});
+});
+
 server.listen(8080, function(){
   logger.debug('listening on *:8080');
 });
@@ -77,32 +93,7 @@ socket.on('message', function(message) {
     }
   }
   else if (message.type == "bed") {
-    s = 0;
-    if (message.startOrStop == 'start' && message.headOrFeet == 'feet' && message.direction == 'up') {
-      s = 2;
-    }
-    else if (message.startOrStop == 'start' && message.headOrFeet == 'head' && message.direction == 'up') {
-      s = 1;
-    }
-    else if (message.startOrStop == 'stop' && message.headOrFeet == 'feet' && message.direction == 'up') {
-      s = 6;
-    }
-    else if (message.startOrStop == 'stop' && message.headOrFeet == 'head' && message.direction == 'up') {
-      s = 5;
-    }
-    else if (message.startOrStop == 'start' && message.headOrFeet == 'feet' && message.direction == 'down') {
-      s = 4;
-    }
-    else if (message.startOrStop == 'start' && message.headOrFeet == 'head' && message.direction == 'down') {
-      s = 3;
-    }
-    else if (message.startOrStop == 'stop' && message.headOrFeet == 'feet' && message.direction == 'down') {
-      s = 8;
-    }
-    else if (message.startOrStop == 'stop' && message.headOrFeet == 'head' && message.direction == 'down') {
-      s = 7;
-    }
-    arduinoController.writeToMotorArduino(s, logger);
+    bedControl(message.startOrStop, message.headOrFeet, message.direction);
   }
   else if (message.type == "setAlarm") {
     logger.debug("calling setAlarm");
@@ -137,4 +128,33 @@ function httpGet(url)
     .catch((error) => {
       logger.debug("error " + error);
     });
+}
+
+function bedControl(startOrStop, headOrFeet, direction) {
+  s = 0;
+  if (startOrStop == 'start' && headOrFeet == 'feet' && direction == 'up') {
+    s = 2;
+  }
+  else if (startOrStop == 'start' && headOrFeet == 'head' && direction == 'up') {
+    s = 1;
+  }
+  else if (startOrStop == 'stop' && headOrFeet == 'feet' && direction == 'up') {
+    s = 6;
+  }
+  else if (startOrStop == 'stop' && headOrFeet == 'head' && direction == 'up') {
+    s = 5;
+  }
+  else if (startOrStop == 'start' && headOrFeet == 'feet' && direction == 'down') {
+    s = 4;
+  }
+  else if (startOrStop == 'start' && headOrFeet == 'head' && direction == 'down') {
+    s = 3;
+  }
+  else if (startOrStop == 'stop' && headOrFeet == 'feet' && direction == 'down') {
+    s = 8;
+  }
+  else if (startOrStop == 'stop' && headOrFeet == 'head' && direction == 'down') {
+    s = 7;
+  }
+  arduinoController.writeToMotorArduino(s, logger);
 }
