@@ -143,43 +143,40 @@ function bedControl(startOrStop, headOrFeet, direction) {
 
 
   if (startOrStop == 'start' && headOrFeet == 'feet' && direction == 'up') {
-    arduinoController.writeToMotorArduino(stopFeetUp);
+    //arduinoController.writeToMotorArduino(stopFeetUp);
     arduinoController.writeToMotorArduino(startFeetUp);
     return;
-    //s = 2;
   }
   else if (startOrStop == 'start' && headOrFeet == 'head' && direction == 'up') {
-    arduinoController.writeToMotorArduino(stopHeadUp);
+    //arduinoController.writeToMotorArduino(stopHeadUp);
     arduinoController.writeToMotorArduino(startHeadUp);
-    return;
-    //s = 1;
   }
   else if (startOrStop == 'stop' && headOrFeet == 'feet' && direction == 'up') {
       arduinoController.writeToMotorArduino(stopFeetUp);
-      return;
+
   }
   else if (startOrStop == 'stop' && headOrFeet == 'head' && direction == 'up') {
       arduinoController.writeToMotorArduino(stopHeadUp);
-      return;
+
   }
   else if (startOrStop == 'start' && headOrFeet == 'feet' && direction == 'down') {
-      arduinoController.writeToMotorArduino(stopFeetDown);
+      //arduinoController.writeToMotorArduino(stopFeetDown);
       arduinoController.writeToMotorArduino(startFeetDown);
-      return;
+
   }
   else if (startOrStop == 'start' && headOrFeet == 'head' && direction == 'down') {
-      arduinoController.writeToMotorArduino(stopHeadDown);
+      //arduinoController.writeToMotorArduino(stopHeadDown);
       arduinoController.writeToMotorArduino(startHeadDown);
-      return;
+
   }
   else if (startOrStop == 'stop' && headOrFeet == 'feet' && direction == 'down') {
       arduinoController.writeToMotorArduino(stopFeetDown);
-      return;
+
   }
   else if (startOrStop == 'stop' && headOrFeet == 'head' && direction == 'down') {
       arduinoController.writeToMotorArduino(stopHeadDown);
-      return;
+  } else {
+      arduinoController.writeToMotorArduino(defaultCode, logger);
   }
 
-  arduinoController.writeToMotorArduino(defaultCode, logger);
 }
