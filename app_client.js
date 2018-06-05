@@ -17,9 +17,13 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 var io = require('socket.io-client'),
-
-socket = io.connect('http://35.187.83.210/');
+socket = io.connect('https://ariot.knowit.no/');
 arduinoMotorControl.connectToMotorArduino(logger);
+
+app.get('/', function(req, res){
+  res.send("KnowIot client service is running!");
+  console.log("i am client /");
+});
 
 server.listen(8080, function(){
   logger.debug('listening on *:8080');
@@ -37,39 +41,28 @@ socket.on('message', function(message) {
     logger.debug("light");
     if (message.dimValue) {
       logger.debug("calling dimLight");
-      httpGet('http://192.168.100.210:3000/dim/2/' + (message.dimValue * parseInt(2.5)));
+      httpGet('http://localhost:3000/dim/2/' + (message.dimValue * parseInt(2.5)));
     }
     else if (message.value) {
       logger.debug("calling toggleLight On");
-      httpGet('http://192.168.100.210:3000/switch/2/on');
+      httpGet('http://localhost:3000/switch/2/on');
     }
     else if (!message.value) {
       logger.debug("calling toggleLight Off");
-      httpGet('http://192.168.100.210:3000/switch/2/off');
+      httpGet('http://localhost:3000/switch/2/off');
     }
   }
   else if (message.type == "heat") {
     logger.debug("heat");
     if (message.value) {
       logger.debug("calling toggleHeat On");
-      httpGet('http://192.168.100.210:3000/switch/1/on');
+      httpGet('http://localhost:3000/switch/1/on');
     }
     else if (!message.value) {
       logger.debug("calling toggleHeat Off");
-      httpGet('http://192.168.100.210:3000/switch/1/off');
+      httpGet('http://localhost:3000/switch/1/off');
     }
   }
-  else if (message.type == "bed") {
-
-  }
-  // else if (message.type == "headAngle") {
-  //   logger.debug("calling headAngle");
-  //   httpGet('http://192.168.100.210:3000/angle/' + 'A/'+ (message.headAngleValue));
-  // }
-  // else if (message.type == "feetAngle") {
-  //   logger.debug("calling feetAngle");
-  //   httpGet('http://192.168.100.210:3000/angle/' + 'B/'+ (message.feetAngleValue));
-  // }
   else if (message.type == "setAlarm") {
     logger.debug("calling setAlarm");
     if (message.time == 0) {
