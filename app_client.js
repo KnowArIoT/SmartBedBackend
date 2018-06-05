@@ -55,6 +55,17 @@ socket.on('message', function(message) {
       httpGet('http://localhost:3000/switch/2/off');
     }
   }
+  else if (message.type == "led") {
+    logger.debug("led");
+    if (message.value) {
+      logger.debug("calling toggleLed On");
+      httpGet('http://localhost:3000/switch/6/on');
+    }
+    else {
+      logger.debug("calling toggleLed Off");
+      httpGet('http://localhost:3000/switch/6/off');
+    }
+  }
   else if (message.type == "heat") {
     logger.debug("heat");
     if (message.value) {
@@ -92,7 +103,7 @@ socket.on('message', function(message) {
     else if (message.startOrStop == 'stop' && message.headOrFeet == 'head' && message.direction == 'down') {
       s = 7;
     }
-    arduinoControlles.writeToMotorArduino(s, logger);
+    arduinoController.writeToMotorArduino(s, logger);
   }
   else if (message.type == "setAlarm") {
     logger.debug("calling setAlarm");

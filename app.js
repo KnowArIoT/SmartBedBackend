@@ -5,7 +5,7 @@ var io = require('socket.io')(http);
 const fetch = require('node-fetch')
 var bodyParser = require('body-parser');
 var log4js = require('log4js');
-var log4js = require('./db-helper');
+var database = require('./db-helper');
 
 log4js.configure({
   appenders: { 'file': { type: 'file', filename: 'logs/app_client.log' } },
@@ -32,7 +32,116 @@ app.get('/', function(req, res){
 
 app.get('/sensorData', function(req, res){
   //Sebastian, get sensordata på dette formatet
-  res.send({});
+  obj = {
+    "sensorStatistics": [
+      {
+        "sensor_id": "flex",
+        "history": [
+          {
+            "minuteOfTime": "2018-06-05T14:55",
+            "averageSensorValue": 3
+          },
+          {
+            "minuteOfTime": "2018-06-05T16:47",
+            "averageSensorValue": 3
+          },
+          {
+            "minuteOfTime": "2018-06-05T18:12",
+            "averageSensorValue": 3
+          },
+          {
+            "minuteOfTime": "2018-06-05T19:34",
+            "averageSensorValue": 3
+          }
+        ]
+      },
+      {
+        "sensor_id": "pressure",
+        "history": [
+          {
+            "minuteOfTime": "2018-06-05T14:55",
+            "averageSensorValue": 1
+          },
+          {
+            "minuteOfTime": "2018-06-05T16:47",
+            "averageSensorValue": 1
+          },
+          {
+            "minuteOfTime": "2018-06-05T18:12",
+            "averageSensorValue": 1
+          },
+          {
+            "minuteOfTime": "2018-06-05T19:34",
+            "averageSensorValue": 1
+          }
+        ]
+      },
+      {
+        "sensor_id": "temperature",
+        "history": [
+          {
+            "minuteOfTime": "2018-06-05T14:55",
+            "averageSensorValue": 1
+          },
+          {
+            "minuteOfTime": "2018-06-05T16:47",
+            "averageSensorValue": 1
+          },
+          {
+            "minuteOfTime": "2018-06-05T18:12",
+            "averageSensorValue": 1
+          },
+          {
+            "minuteOfTime": "2018-06-05T19:34",
+            "averageSensorValue": 1
+          }
+        ]
+      },
+      {
+        "sensor_id": "humidity",
+        "history": [
+          {
+            "minuteOfTime": "2018-06-05T14:55",
+            "averageSensorValue": 2
+          },
+          {
+            "minuteOfTime": "2018-06-05T16:47",
+            "averageSensorValue": 2
+          },
+          {
+            "minuteOfTime": "2018-06-05T18:12",
+            "averageSensorValue": 2
+          },
+          {
+            "minuteOfTime": "2018-06-05T19:34",
+            "averageSensorValue": 2
+          }
+        ]
+      },
+      {
+        "sensor_id": "light",
+        "history": [
+          {
+            "minuteOfTime": "2018-06-05T14:55",
+            "averageSensorValue": 2
+          },
+          {
+            "minuteOfTime": "2018-06-05T16:47",
+            "averageSensorValue": 2
+          },
+          {
+            "minuteOfTime": "2018-06-05T18:12",
+            "averageSensorValue": 2
+          },
+          {
+            "minuteOfTime": "2018-06-05T19:34",
+            "averageSensorValue": 2
+          }
+        ]
+      }
+    ]
+  }
+  res.send(obj);
 });
 
 app.get('/toggleLightOn', function(req, res){
@@ -44,6 +153,18 @@ app.get('/toggleLightOn', function(req, res){
 app.get('/toggleLightOff', function(req, res){
   console.log("calling toggleLightOff");
   socket.emit('message', {type: "light", value: false});
+  res.send({});
+});
+
+app.get('/toggleLedOn', function(req, res){
+  console.log("calling toggleLedOn");
+  socket.emit('message', {type: "led", value: true});
+  res.send({});
+});
+
+app.get('/toggleLedOff', function(req, res){
+  console.log("calling toggleLedOff");
+  socket.emit('message', {type: "led", value: false});
   res.send({});
 });
 
