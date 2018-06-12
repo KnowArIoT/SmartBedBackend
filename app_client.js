@@ -170,9 +170,9 @@ socket.on('message', message => {
     // Peder fix set alarm
   } else if (message.type === 'wakeup') {
     console.log('calling wakeup');
-    httpGet('http://192.168.100.210:3000/scene/wakeup');
+    httpGet('http://localhost:3000/scene/wakeup');
   } else if (message.type === 'sleep') {
     console.log('calling sleep');
-    httpGet('http://192.168.100.210:3000/scene/sleep');
+    httpGet('http://localhost:3000/scene/sleep');
   }
 });
