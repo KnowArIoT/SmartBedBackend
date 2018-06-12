@@ -38,7 +38,7 @@ async function setSensorData(sensor_id, value) {
 
 // eslint-disable-next-line
 async function getSensorData(days) {
-  const sql = "SELECT sensor_id, AVG(value) as avg_value, date_trunc('minute', datetime) as trunc_minute FROM zzzmartbed.sensor_data WHERE datetime > current_timestamp - (? || ' day')::interval GROUP BY 1, 3 ORDER BY 3";
+  const sql = "SELECT sensor_id, AVG(value) as avg_value, date_trunc('minute', datetime) as trunc_minute FROM zzzmartbed.sensor_data WHERE datetime > current_timestamp - ($1 || ' day')::interval GROUP BY 1, 3 ORDER BY 3";
   let results;
   try {
     results = await client.query(sql, [days]);
