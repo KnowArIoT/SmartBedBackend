@@ -25,10 +25,10 @@ app.get('/', (req, res) => {
 
 app.get('/sensorData/:days', async (req, res) => {
   const { days } = req.params;
-  const dateOffset = 24 * 60 * 60 * 1000 * parseInt(days, 10);
-  const myDate = new Date();
-  myDate.setTime(myDate.getTime() - dateOffset);
-  const dateNow = new Date(myDate).toISOString();
+  //const dateOffset = 24 * 60 * 60 * 1000 * parseInt(days, 10);
+  //const myDate = new Date();
+  // myDate.setTime(myDate.getTime() - dateOffset);
+  const dateNow = new Date().toISOString();
   console.log(dateNow);
   // Sebastian, get sensordata på dette formatet
 
@@ -57,7 +57,7 @@ app.get('/sensorData/:days', async (req, res) => {
     ],
   };
 
-  const sensorData = getSensorData(days)
+  const sensorData = await getSensorData(days);
   for (let i = 0, len = sensorData.rows.length; i < len; i++) {
       const sensorReading = sensorData.rows[i];
       obj.sensorStatistics.find((item) => item.sensor_id === sensorReading.sensor_id).history.push({minuteOfTime: sensorReading.trunc_minute, averageSensorValue: sensorReading.avg_value});
