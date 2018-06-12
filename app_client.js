@@ -15,10 +15,10 @@ function httpGet(url) {
   fetch(url)
     .then(response => response.json())
     .then(myJson => {
-      logger.debug(myJson);
+      console.log(myJson);
     })
     .catch(error => {
-      logger.debug(`error ${error}`);
+      console.log(`error ${error}`);
     });
 }
 
@@ -103,11 +103,11 @@ app.get('/bed/:startOrStop/:headOrFeet/:direction', (req, res) => {
 });
 
 server.listen(8080, () => {
-  logger.debug('listening on *:8080');
+  console.log('listening on *:8080');
 });
 
 app.post('/registerSensorData', (req, res) => {
-  logger.debug(`sending sensor Data ${JSON.stringify(req.body)}`);
+  console.log(`sending sensor Data ${JSON.stringify(req.body)}`);
   socket.emit('message', {
     type: 'sensorData',
     pressure: req.body.pressure,
@@ -120,48 +120,48 @@ app.post('/registerSensorData', (req, res) => {
 });
 
 socket.on('connect', () => {
-  logger.debug('Connected to socket');
+  console.log('Connected to socket');
   arduinoController.setSocket(socket);
 });
 
 socket.on('message', message => {
-  logger.debug(`server says ${JSON.stringify(message)}`);
+  console.log(`server says ${JSON.stringify(message)}`);
   if (message.type === 'light') {
-    logger.debug('light');
+    console.log('light');
     if (message.dimValue) {
-      logger.debug('calling dimLight');
+      console.log('calling dimLight');
       httpGet(
         `http://localhost:3000/dim/2/${message.dimValue * parseInt(2.5, 10)}`,
       );
     } else if (message.value) {
-      logger.debug('calling toggleLight On');
+      console.log('calling toggleLight On');
       httpGet('http://localhost:3000/switch/2/on');
     } else if (!message.value) {
-      logger.debug('calling toggleLight Off');
+      console.log('calling toggleLight Off');
       httpGet('http://localhost:3000/switch/2/off');
     }
   } else if (message.type === 'led') {
-    logger.debug('led');
+    console.log('led');
     if (message.value) {
-      logger.debug('calling toggleLed On');
+      console.log('calling toggleLed On');
       httpGet('http://localhost:3000/switch/6/on');
     } else {
-      logger.debug('calling toggleLed Off');
+      console.log('calling toggleLed Off');
       httpGet('http://localhost:3000/switch/6/off');
     }
   } else if (message.type === 'heat') {
-    logger.debug('heat');
+    console.log('heat');
     if (message.value) {
-      logger.debug('calling toggleHeat On');
+      console.log('calling toggleHeat On');
       httpGet('http://localhost:3000/switch/1/on');
     } else if (!message.value) {
-      logger.debug('calling toggleHeat Off');
+      console.log('calling toggleHeat Off');
       httpGet('http://localhost:3000/switch/1/off');
     }
   } else if (message.type === 'bed') {
     bedControl(message.startOrStop, message.headOrFeet, message.direction);
   } else if (message.type === 'setAlarm') {
-    logger.debug('calling setAlarm');
+    console.log('calling setAlarm');
     if (message.time === 0) {
       // slett alarm
     } else {
@@ -169,10 +169,10 @@ socket.on('message', message => {
     }
     // Peder fix set alarm
   } else if (message.type === 'wakeup') {
-    logger.debug('calling wakeup');
+    console.log('calling wakeup');
     httpGet('http://192.168.100.210:3000/scene/wakeup');
   } else if (message.type === 'sleep') {
-    logger.debug('calling sleep');
+    console.log('calling sleep');
     httpGet('http://192.168.100.210:3000/scene/sleep');
   }
 });

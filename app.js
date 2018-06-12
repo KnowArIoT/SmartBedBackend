@@ -5,7 +5,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const bodyParser = require('body-parser');
-const logger = require('./utils/log4js');
+// const logger = require('./utils/log4js');
 const { getSensorData, setSensorData } = require('./db-helper');
 
 app.use(bodyParser.json());
@@ -25,8 +25,8 @@ app.get('/', (req, res) => {
 
 app.get('/sensorData/:days', async (req, res) => {
   const { days } = req.params;
-  //const dateOffset = 24 * 60 * 60 * 1000 * parseInt(days, 10);
-  //const myDate = new Date();
+  // const dateOffset = 24 * 60 * 60 * 1000 * parseInt(days, 10);
+  // const myDate = new Date();
   // myDate.setTime(myDate.getTime() - dateOffset);
   const dateNow = new Date().toISOString();
   console.log(dateNow);
@@ -36,31 +36,36 @@ app.get('/sensorData/:days', async (req, res) => {
     sensorStatistics: [
       {
         sensor_id: 'flex',
-        history: []
+        history: [],
       },
       {
         sensor_id: 'pressure',
-        history: []
+        history: [],
       },
       {
         sensor_id: 'temperature',
-        history: []
+        history: [],
       },
       {
         sensor_id: 'humidity',
-        history: []
+        history: [],
       },
       {
         sensor_id: 'light',
-        history: []
-      }
+        history: [],
+      },
     ],
   };
 
   const sensorData = await getSensorData(days);
   for (let i = 0, len = sensorData.rows.length; i < len; i++) {
-      const sensorReading = sensorData.rows[i];
-      obj.sensorStatistics.find((item) => item.sensor_id === sensorReading.sensor_id).history.push({minuteOfTime: sensorReading.trunc_minute, averageSensorValue: sensorReading.avg_value});
+    const sensorReading = sensorData.rows[i];
+    obj.sensorStatistics
+      .find(item => item.sensor_id === sensorReading.sensor_id)
+      .history.push({
+        minuteOfTime: sensorReading.trunc_minute,
+        averageSensorValue: sensorReading.avg_value,
+      });
   }
 
   res.send(obj);
@@ -152,17 +157,17 @@ io.sockets.on('connection', newSocket => {
     console.log(`type: ${message.type}`);
 
     if (message.type === 'sensorData') {
-        const pressure = parseInt(message.pressure, 10);
-        const light = parseInt(message.light, 10);
-        const flex = parseInt(message.flex, 10);
-        const temperature = parseFloat(message.temperature);
-        const humidity = parseFloat(message.humidity);
+      const pressure = parseInt(message.pressure, 10);
+      const light = parseInt(message.light, 10);
+      const flex = parseInt(message.flex, 10);
+      const temperature = parseFloat(message.temperature);
+      const humidity = parseFloat(message.humidity);
 
-        setSensorData('pressure', pressure);
-        setSensorData('light', light);
-        setSensorData('flex', flex);
-        setSensorData('temperature', temperature);
-        setSensorData('humidity', humidity);
+      setSensorData('pressure', pressure);
+      setSensorData('light', light);
+      setSensorData('flex', flex);
+      setSensorData('temperature', temperature);
+      setSensorData('humidity', humidity);
     }
   });
 });
