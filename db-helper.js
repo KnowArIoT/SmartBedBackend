@@ -16,7 +16,7 @@ function getNewClient() {
 async function setSensorData(sensor_id, value) {
   const sql =
     'INSERT INTO zzzmartbed.sensor_data(sensor_id, value, datetime, user_id, bed_id)' +
-    'VALUES ($1, $2, $3, $4, $5)';
+    'VALUES ($1, $2, current_timestamp AT TIME ZONE \'Europe/Oslo\', $3, $4)';
 
   let results;
   const client = getNewClient()
@@ -25,7 +25,7 @@ async function setSensorData(sensor_id, value) {
           console.error('connection error', err.stack);
       }});
   try {
-    results = await client.query(sql, [sensor_id, value, new Date(), null, "ariot_bed"]);
+    results = await client.query(sql, [sensor_id, value, null, "ariot_bed"]);
     await client.end();
   } catch (e) {
     console.error(e.stack);
@@ -37,7 +37,7 @@ async function setSensorData(sensor_id, value) {
 
 // eslint-disable-next-line
 async function getSensorData(days) {
-  const sql = "SELECT sensor_id, AVG(value) as avg_value, date_trunc('minute', datetime) as trunc_minute FROM zzzmartbed.sensor_data WHERE datetime > current_timestamp - ($1 || ' days')::interval GROUP BY 1, 3 ORDER BY 3";
+  const sql = "SELECT sensor_id, AVG(value) as avg_value, date_trunc('minute', datetime) AT TIME ZONE 'Europe/Oslo' as trunc_minute FROM zzzmartbed.sensor_data WHERE datetime > (current_timestamp - ($1 || ' days')::interval) AT TIME ZONE 'Europe/Oslo' GROUP BY 1, 3 ORDER BY 3";
   let results;
   const client = getNewClient()
   client.connect(err => {
