@@ -4,35 +4,14 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const logger = require('./utils/log4js');
-// const { getSensorData, setSensorData } = require('./db-helper');
+const { getSensorData, setSensorData } = require('./db-helper');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 let socket = null;
-
-function httpPost(url, data) {
-  fetch(url, {
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: data,
-    method: 'POST',
-  })
-    .then(response => {
-      const strMessage = { ...response };
-      console.log(`response ${JSON.stringify(strMessage)}`);
-      console.log(response.status);
-    })
-    .catch(error => {
-      console.log(`error ${error}`);
-      logger.debug(`error ${error}`);
-    });
-}
 
 http.listen(8080, () => {
   console.log('listening on *:8080');
@@ -46,121 +25,44 @@ app.get('/', (req, res) => {
 
 app.get('/sensorData/:days', async (req, res) => {
   const { days } = req.params;
-  const dateOffset = 24 * 60 * 60 * 1000 * parseInt(days, 10);
-  const myDate = new Date();
-  myDate.setTime(myDate.getTime() - dateOffset);
-  const dateNow = new Date(myDate).toISOString();
+  //const dateOffset = 24 * 60 * 60 * 1000 * parseInt(days, 10);
+  //const myDate = new Date();
+  // myDate.setTime(myDate.getTime() - dateOffset);
+  const dateNow = new Date().toISOString();
   console.log(dateNow);
   // Sebastian, get sensordata på dette formatet
+
   const obj = {
     sensorStatistics: [
       {
         sensor_id: 'flex',
-        history: [
-          {
-            minuteOfTime: '2018-06-05T14:55',
-            averageSensorValue: 3,
-          },
-          {
-            minuteOfTime: '2018-06-05T16:47',
-            averageSensorValue: 3,
-          },
-          {
-            minuteOfTime: '2018-06-05T18:12',
-            averageSensorValue: 3,
-          },
-          {
-            minuteOfTime: '2018-06-05T19:34',
-            averageSensorValue: 3,
-          },
-        ],
+        history: []
       },
       {
         sensor_id: 'pressure',
-        history: [
-          {
-            minuteOfTime: '2018-06-05T14:55',
-            averageSensorValue: 1,
-          },
-          {
-            minuteOfTime: '2018-06-05T16:47',
-            averageSensorValue: 1,
-          },
-          {
-            minuteOfTime: '2018-06-05T18:12',
-            averageSensorValue: 1,
-          },
-          {
-            minuteOfTime: '2018-06-05T19:34',
-            averageSensorValue: 1,
-          },
-        ],
+        history: []
       },
       {
         sensor_id: 'temperature',
-        history: [
-          {
-            minuteOfTime: '2018-06-05T14:55',
-            averageSensorValue: 1,
-          },
-          {
-            minuteOfTime: '2018-06-05T16:47',
-            averageSensorValue: 1,
-          },
-          {
-            minuteOfTime: '2018-06-05T18:12',
-            averageSensorValue: 1,
-          },
-          {
-            minuteOfTime: '2018-06-05T19:34',
-            averageSensorValue: 1,
-          },
-        ],
+        history: []
       },
       {
         sensor_id: 'humidity',
-        history: [
-          {
-            minuteOfTime: '2018-06-05T14:55',
-            averageSensorValue: 2,
-          },
-          {
-            minuteOfTime: '2018-06-05T16:47',
-            averageSensorValue: 2,
-          },
-          {
-            minuteOfTime: '2018-06-05T18:12',
-            averageSensorValue: 2,
-          },
-          {
-            minuteOfTime: '2018-06-05T19:34',
-            averageSensorValue: 2,
-          },
-        ],
+        history: []
       },
       {
         sensor_id: 'light',
-        history: [
-          {
-            minuteOfTime: '2018-06-05T14:55',
-            averageSensorValue: 2,
-          },
-          {
-            minuteOfTime: '2018-06-05T16:47',
-            averageSensorValue: 2,
-          },
-          {
-            minuteOfTime: '2018-06-05T18:12',
-            averageSensorValue: 2,
-          },
-          {
-            minuteOfTime: '2018-06-05T19:34',
-            averageSensorValue: 2,
-          },
-        ],
-      },
+        history: []
+      }
     ],
   };
+
+  const sensorData = await getSensorData(days);
+  for (let i = 0, len = sensorData.rows.length; i < len; i++) {
+      const sensorReading = sensorData.rows[i];
+      obj.sensorStatistics.find((item) => item.sensor_id === sensorReading.sensor_id).history.push({minuteOfTime: sensorReading.trunc_minute, averageSensorValue: sensorReading.avg_value});
+  }
+
   res.send(obj);
 });
 
@@ -250,40 +152,17 @@ io.sockets.on('connection', newSocket => {
     console.log(`type: ${message.type}`);
 
     if (message.type === 'sensorData') {
-      const pressure = parseInt(message.pressure, 10);
-      const light = parseInt(message.light, 10);
-      const flex = parseInt(message.flex, 10);
-      const temperature = parseFloat(message.temperature);
-      const humidity = parseFloat(message.humidity);
-      const obj = {
-        bed_id: 'ariot_seng',
-        data: [
-          {
-            name: 'pressure',
-            value: pressure,
-          },
-          {
-            name: 'light',
-            value: light,
-          },
-          {
-            name: 'flex',
-            value: flex,
-          },
-          {
-            name: 'temperature',
-            value: temperature,
-          },
-          {
-            name: 'humidity',
-            value: humidity,
-          },
-        ],
-      };
-      httpPost(
-        'http://localhost:8081/sensorData/insertValues',
-        JSON.stringify(obj),
-      );
+        const pressure = parseInt(message.pressure, 10);
+        const light = parseInt(message.light, 10);
+        const flex = parseInt(message.flex, 10);
+        const temperature = parseFloat(message.temperature);
+        const humidity = parseFloat(message.humidity);
+
+        setSensorData('pressure', pressure);
+        setSensorData('light', light);
+        setSensorData('flex', flex);
+        setSensorData('temperature', temperature);
+        setSensorData('humidity', humidity);
     }
   });
 });
