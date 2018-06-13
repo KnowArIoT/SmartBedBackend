@@ -33,7 +33,7 @@ async function setSensorData(sensor_id, value) {
   let results;
   if (clientConnected) {
     try {
-      results = await client.query(sql, [sensor_id, value, null, "ariot_bed"]);
+      results = await client.query(sql, [sensor_id, value, 1, 1]);
       await client.end();
     } catch (e) {
       console.error(e.stack);
