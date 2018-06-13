@@ -1,6 +1,18 @@
 const { Client } = require('pg');
 const logger = require('./utils/log4js');
 
+clientConnected = false;
+
+const client = getNewClient()
+client.connect(err => {
+    if (err) {
+        console.error('connection error', err.stack);
+    }
+    else {
+      clientConnected = true;
+    }
+  });
+
 function getNewClient() {
     return new Client({
         user: process.env.DB_USER,
@@ -19,40 +31,34 @@ async function setSensorData(sensor_id, value) {
     'VALUES ($1, $2, current_timestamp AT TIME ZONE \'Europe/Oslo\', $3, $4)';
 
   let results;
-  const client = getNewClient()
-  client.connect(err => {
-      if (err) {
-          console.error('connection error', err.stack);
-      }});
-  try {
-    results = await client.query(sql, [sensor_id, value, null, "ariot_bed"]);
-    await client.end();
-  } catch (e) {
-    console.error(e.stack);
-    logger.debug(`error ${e.stack}`);
-    await client.end();
+  if (clientConnected) {
+    try {
+      results = await client.query(sql, [sensor_id, value, null, "ariot_bed"]);
+      await client.end();
+    } catch (e) {
+      console.error(e.stack);
+      logger.debug(`error ${e.stack}`);
+      await client.end();
+    }
+    return results;
   }
-  return results;
 }
 
 // eslint-disable-next-line
 async function getSensorData(days) {
   const sql = "SELECT sensor_id, AVG(value) as avg_value, date_trunc('minute', datetime) AT TIME ZONE 'Europe/Oslo' as trunc_minute FROM zzzmartbed.sensor_data WHERE datetime > (current_timestamp - ($1 || ' days')::interval) AT TIME ZONE 'Europe/Oslo' GROUP BY 1, 3 ORDER BY 3";
   let results;
-  const client = getNewClient()
-  client.connect(err => {
-      if (err) {
-          console.error('connection error', err.stack);
-      }});
-  try {
-    results = await client.query(sql, [days]);
-    await client.end();
-  } catch (e) {
-    console.error(e.stack);
-    logger.debug(`error ${e.stack}`);
-    await client.end();
+  if (clientConnected) {
+    try {
+      results = await client.query(sql, [days]);
+      //await client.end();
+    } catch (e) {
+      console.error(e.stack);
+      //logger.debug(`error ${e.stack}`);
+      //await client.end();
+    }
+    return results;
   }
-  return results;
 }
 
 module.exports = {
