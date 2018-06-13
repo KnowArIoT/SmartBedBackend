@@ -20,17 +20,10 @@ http.listen(8080, () => {
 app.get('/', (req, res) => {
   res.send('KnowIot backend service is running!');
   console.log('calling root /');
-  res.send({});
 });
 
 app.get('/sensorData/:days', async (req, res) => {
   const { days } = req.params;
-  // const dateOffset = 24 * 60 * 60 * 1000 * parseInt(days, 10);
-  // const myDate = new Date();
-  // myDate.setTime(myDate.getTime() - dateOffset);
-  const dateNow = new Date().toISOString();
-  console.log(dateNow);
-  // Sebastian, get sensordata på dette formatet
 
   const obj = {
     sensorStatistics: [
@@ -133,6 +126,15 @@ app.get('/scene/sleep', (req, res) => {
 
 app.post('/bed', (req, res) => {
   const { startOrStop, headOrFeet, direction } = req.body;
+  console.log('Setting bed parameters!');
+  console.log(
+    'startOrStop:',
+    startOrStop,
+    'headOrFeet:',
+    headOrFeet,
+    'direction:',
+    direction,
+  );
   socket.emit('message', {
     type: 'bed',
     startOrStop,
@@ -162,6 +164,20 @@ io.sockets.on('connection', newSocket => {
       const flex = parseInt(message.flex, 10);
       const temperature = parseFloat(message.temperature);
       const humidity = parseFloat(message.humidity);
+
+      console.log('Setting sensor data!');
+      console.log(
+        'pressure:',
+        pressure,
+        'light:',
+        light,
+        'flex:',
+        flex,
+        'temperature:',
+        temperature,
+        'humidity:',
+        humidity,
+      );
 
       setSensorData('pressure', pressure);
       setSensorData('light', light);
