@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const arduinoController = require('./arduino-controller');
 const logger = require('./utils/log4js');
+var player = require('play-sound')(opts = {})
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -118,6 +119,98 @@ app.post('/registerSensorData', (req, res) => {
   });
   res.send('ok');
 });
+
+app.get('/toggleLightOn', (req, res) => {
+  console.log('calling toggleLightOn');
+  httpGet('http://localhost:3000/switch/2/on');
+  res.send({});
+});
+
+app.get('/toggleLightOff', (req, res) => {
+  console.log('calling toggleLightOff');
+  httpGet('http://localhost:3000/switch/2/off');
+  res.send({});
+});
+
+app.get('/toggleLedOn', (req, res) => {
+  console.log('calling toggleLedOn');
+  httpGet('http://localhost:3000/switch/6/on');
+  res.send({});
+});
+
+app.get('/toggleLedOff', (req, res) => {
+  console.log('calling toggleLedOff');
+  httpGet('http://localhost:3000/switch/6/off');
+  res.send({});
+});
+
+app.get('/dimLight/:dimValue', (req, res) => {
+  console.log('calling dimLight');
+  const { dimValue } = req.params;
+  httpGet(`http://localhost:3000/dim/2/${message.dimValue * parseInt(2.5, 10)}`);
+  res.send({});
+});
+
+app.get('/toggleHeatOn', (req, res) => {
+  console.log('calling toggleHeatOn');
+  httpGet('http://localhost:3000/switch/1/on');
+  res.send({});
+});
+
+app.get('/toggleHeatOff', (req, res) => {
+  console.log('calling toggleHeatOff');
+  httpGet('http://localhost:3000/switch/1/off');
+  res.send({});
+});
+
+app.get('/scene/wakeup', (req, res) => {
+  console.log('calling wakeup');
+  player.play('quote.mp3');
+  httpGet('http://smartbeddypi.local:8080/bed/start/head/up');
+  httpGet('http://smartbeddypi.local:8080/bed/start/feet/up');
+  setTimeout(function () {
+    httpGet('http://smartbeddypi.local:8080/bed/stop/head/up');
+    httpGet('http://smartbeddypi.local:8080/bed/stop/feet/up');
+  }, 15000);
+  // Turn lights on and off a couple of times
+  var x = 0;
+  var intervalID = setInterval(function () {
+    if (x % 2 == 0) {
+      httpGet('http://localhost:3000/switch/2/on');
+      httpGet('http://localhost:3000/switch/6/on');
+    }
+    else {
+      httpGet('http://localhost:3000/switch/2/off');
+      httpGet('http://localhost:3000/switch/6/off');
+    }
+    if (++x === 7) {
+      clearInterval(intervalID);
+    }
+  }, 2000);
+});
+
+app.get('/scene/sleep', (req, res) => {
+  console.log('calling sleep');
+  var x = 0;
+  player.play('snoring.mp3');
+  var intervalID = setInterval(function () {
+    player.play('snoring.mp3');
+    if (++x === 3) {
+      clearInterval(intervalID);
+    }
+  }, 4000);
+  var that = this;
+  httpGet('http://smartbeddypi.local:8080/bed/start/head/down');
+  httpGet('http://smartbeddypi.local:8080/bed/start/feet/down');
+  setTimeout(function () {
+    httpGet('http://smartbeddypi.local:8080/bed/stop/head/down');
+    httpGet('http://smartbeddypi.local:8080/bed/stop/feet/down');
+    httpGet('http://localhost:3000/switch/2/off');
+    httpGet('http://localhost:3000/switch/6/off');
+  }, 12000);
+  res.send({});
+});
+
 
 socket.on('connect', () => {
   console.log('Connected to socket');

@@ -15,6 +15,7 @@
     "log4js": "^2.8.0",
     "node-fetch": "2.1.2",
     "pg": "^7.4.3",
+    "play-sound": "^1.1.2",
     "serialport": "^6.2.0",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1"
